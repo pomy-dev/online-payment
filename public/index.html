@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pay with Paystack</title>
+  <script src="https://js.paystack.co/v2/inline.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 420px;
+      margin: 60px auto;
+      padding: 20px;
+      text-align: center;
+      background: #f7f9fc;
+    }
+
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #0a7b3e;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 10px;
+      font-size: 16px;
+      background-color: #0a7b3e;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover:not(:disabled) {
+      background-color: #086b35;
+    }
+
+    button:disabled {
+      background-color: #7bbf9a;
+      cursor: not-allowed;
+    }
+
+    #message {
+      margin-top: 18px;
+      font-weight: 500;
+      min-height: 24px;
+    }
+
+    .loading {
+      color: #555;
+    }
+
+    .error {
+      color: #d32f2f;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h2>Pay with Paystack</h2>
+
+    <input type="email" id="email" placeholder="Your email" value="customer@example.com">
+    <input type="number" id="amount" placeholder="Amount (e.g. 100)" value="100" min="1">
+
+    <button id="payBtn" onclick="pay()">Pay Now</button>
+
+    <div id="message"></div>
+  </div>
+
+  <script>
+    const payBtn = document.getElementById('payBtn');
+    const message = document.getElementById('message');
+
+    async function pay() {
+      const email = document.getElementById('email').value.trim();
+      const amount = document.getElementById('amount').value;
+
+      if (!email || !amount || amount <= 0) {
+        message.className = 'error';
+        message.textContent = 'Please enter a valid email and amount';
+        return;
+      }
+
+      // Loading state
+      payBtn.disabled = true;
+      payBtn.textContent = 'Processing...';
+      message.className = 'loading';
+      message.textContent = 'Initializing payment...';
+
+      try {
+        const response = await fetch('http://localhost:5000/api/payment/initialize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, amount })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.error || 'Failed to initialize payment');
+        }
+
+        // Open Paystack Inline (Popup) using access_code
+        const popup = new PaystackPop();
+        popup.resumeTransaction(data.access_code, {
+          onSuccess: (transaction) => {
+            // Redirect to success page with the reference
+            window.location.href = `/success.html?reference=${transaction.reference}`;
+          },
+          onCancel: () => {
+            message.className = 'error';
+            message.textContent = 'Payment cancelled';
+            resetButton();
+          }
+        });
+
+      } catch (error) {
+        console.error(error);
+        message.className = 'error';
+        message.textContent = error.message || 'Something went wrong';
+        resetButton();
+      }
+    }
+
+    function resetButton() {
+      payBtn.disabled = false;
+      payBtn.textContent = 'Pay Now';
+    }
+  </script>
+</body>
+
+</html>

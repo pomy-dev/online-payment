@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Successful</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0fdf4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 420px;
+    }
+
+    .icon {
+      font-size: 64px;
+      color: #16a34a;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      color: #166534;
+      margin: 0 0 12px 0;
+    }
+
+    p {
+      color: #555;
+      line-height: 1.5;
+    }
+
+    .reference {
+      background: #f1f5f9;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-family: monospace;
+      margin: 20px 0;
+      word-break: break-all;
+    }
+
+    a {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 24px;
+      background: #0a7b3e;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+    }
+
+    a:hover {
+      background: #086b35;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="icon">✓</div>
+    <h1>Payment Successful!</h1>
+    <p>Thank you. Your payment has been received.</p>
+
+    <div class="reference" id="ref">Loading reference...</div>
+
+    <p style="font-size: 14px; color: #777;">
+      You will also receive a confirmation via webhook on the server.
+    </p>
+
+    <a href="/">Make another payment</a>
+  </div>
+
+  <script>
+    // Get reference from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const reference = urlParams.get('reference');
+
+    if (reference) {
+      document.getElementById('ref').textContent = `Reference: ${reference}`;
+    } else {
+      document.getElementById('ref').textContent = 'No reference found';
+    }
+  </script>
+</body>
+
+</html>
