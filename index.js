@@ -15,7 +15,7 @@ app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
 
 // 2. JSON body parser (this is the important one)
 app.use(express.json());
-app.use(express.static('public'));
+// app.use(express.static('public'));
 
 // 3. Your routes
 app.use('/api/payment', paymentRoutes);

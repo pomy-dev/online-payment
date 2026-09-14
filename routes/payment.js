@@ -61,7 +61,7 @@ router.post('/initialize', async (req, res) => {
       reference: data.data.reference,
     });
   } catch (error) {
-    console.error('Initialize error:', error.message);
+    console.error('Initialize error:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
